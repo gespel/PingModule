@@ -1,7 +1,7 @@
 #pragma once
 #include <Vector.h>
 
-#include <Arduino.h>
+//#include <Arduino.h>
 #include <driver/i2s.h>
 #include <math.h>
 #include "GouodModulesLib/synths.h"
@@ -11,10 +11,10 @@
 #include "GouodModulesLib/handler.h"
 #include "GouodModulesLib/gios.h"
 
-//const int BUFSIZE = 8192;
-//uint16_t audioBuffer[BUFSIZE];
-//int sampleRate = 48000;
-//SawtoothSynth ss(110.0, sampleRate);
+const int BUFSIZE = 1024;
+uint16_t audioBuffer[BUFSIZE];
+int sampleRate = 48000;
+SawtoothSynth ss(110.0, sampleRate);
 
 void setup_i2n(int sampleRate, int bitDepth, int i2sChannel) {
     i2s_config_t i2s_config = {
@@ -45,25 +45,28 @@ void setup_i2n(int sampleRate, int bitDepth, int i2sChannel) {
 void setup() {
     Serial.begin(19200);
     pinMode(18, OUTPUT);
-    //setup_i2n(sampleRate, 16, 0);
+    setup_i2n(sampleRate, 16, 0);
+    while(1) {
+        int16_t sample;
+        size_t bytes_written;
+        int x = 0;
+
+        for (int i = 0; i < BUFSIZE; i++) {
+            //double sample = sf.getSample();
+            double sample = ss.getSample();
+            //fp.setFreq(step->getSample()*55*ph.getPoti(0));
+            //sample *= 0.5;
+            audioBuffer[i] = sample;
+
+            
+            
+        }
+        
+        i2s_write((i2s_port_t)0, audioBuffer, sizeof(audioBuffer), &bytes_written, portMAX_DELAY);
+    }
 }
 
 void loop() {
-    /*int16_t sample;
-    size_t bytes_written;
-    int x = 0;
-
-    for (int i = 0; i < BUFSIZE; i++) {
-        //double sample = sf.getSample();
-        double sample = ss.getSample();
-        //fp.setFreq(step->getSample()*55*ph.getPoti(0));
-        //sample *= 0.5;
-        audioBuffer[i] = sample;
-
-        
-        
-    }
     
-    i2s_write((i2s_port_t)0, audioBuffer, sizeof(audioBuffer), &bytes_written, portMAX_DELAY);*/
 
 }
